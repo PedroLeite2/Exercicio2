@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 
-Widget buildWidgetAdd() {
+Widget buildWidgetLogin() {
   return const Scaffold(
     body: SingleChildScrollView(
       child: Center(

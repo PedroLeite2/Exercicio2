@@ -2,17 +2,20 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static final _databaseName = "avaliacaoex2sqlite.db";
+  static final _databaseName = "myapp.db";
   static final _databaseVersion = 1;
-  static final table = 'Cursos';
+
+  static final tableUsers = 'Users';
   static final columnId = 'id';
-  static final columnName = 'nome';
-  // Classe que usa padrão singleton
+  static final columnName = 'name';
+  static final columnPassword = 'password';
+
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+
   static Database? _database;
   Future<Database> get database async => _database ??= await _initDatabase();
-  // Abre a base de dados e o cria (se não existir)
+
   _initDatabase() async {
     String path = join(await getDatabasesPath(), _databaseName);
     return await openDatabase(
@@ -22,25 +25,31 @@ class DatabaseHelper {
     );
   }
 
-  // SQL para criar a tabela (se não existir)
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-CREATE TABLE $table (
-$columnId INTEGER PRIMARY KEY,
-$columnName VARCHAR(50)
-)
-''');
+      CREATE TABLE $tableUsers (
+        $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+        $columnName TEXT NOT NULL,
+        $columnPassword TEXT NOT NULL
+      )
+    ''');
   }
 
-  // Método para inserir dados
-  Future<int> insert(Map<String, dynamic> row) async {
+  Future<int> registerUser(String name, String password) async {
     Database db = await instance.database;
-    return await db.insert(table, row);
+    return await db.insert(tableUsers, {
+      columnName: name,
+      columnPassword: password,
+    });
   }
 
-  // Método para consultar todos os dados
-  Future<List<Map<String, dynamic>>> queryAllRows() async {
+  Future<bool> loginUser(String name, String password) async {
     Database db = await instance.database;
-    return await db.query(table);
+    var res = await db.query(
+      tableUsers,
+      where: "$columnName = ? AND $columnPassword = ?",
+      whereArgs: [name, password],
+    );
+    return res.isNotEmpty;
   }
 }

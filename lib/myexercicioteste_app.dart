@@ -17,7 +17,7 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
   void initState() {
     super.initState();
     _screenOptions = [
-      buildWidgetAdd(),
+      buildWidgetLogin(),
       buildWidgetList(),
       buildWidgetSettings(),
     ];
