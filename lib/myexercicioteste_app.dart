@@ -39,12 +39,12 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
       body: IndexedStack(index: _selectedIndex, children: _screenOptions),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'List'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.add),
+            label: 'Login/Register',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Questions'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Score'),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: const Color.fromARGB(255, 68, 91, 166),

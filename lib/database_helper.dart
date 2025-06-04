@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static final _databaseName = "myapp.db";
+  static final _databaseName = "avaliacaoex2sql.db";
   static final _databaseVersion = 1;
 
   static final tableUsers = 'Users';
