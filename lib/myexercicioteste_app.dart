@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:avaliacaoex2/myexercicioteste_exemplo1.dart';
-import 'package:avaliacaoex2/myexercicioteste_exemplo2.dart';
+import 'package:avaliacaoex2/buildWidgetQuestions.dart';
 import 'package:avaliacaoex2/myexercicioteste_exemplo3.dart';
+
 
 class MyExercicioTeste extends StatefulWidget {
   final String title;
@@ -18,7 +19,7 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
     super.initState();
     _screenOptions = [
       buildWidgetLogin(),
-      buildWidgetList(),
+      buildWidgetQuestions(),
       buildWidgetSettings(),
     ];
   }
