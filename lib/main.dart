@@ -21,7 +21,8 @@ class ExercicioTeste extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MyExercicioTeste(title: 'MyExercicioTeste'),
+      home: const MyExercicioTeste(title: 'OHHHH NOOOO this is a test!'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
