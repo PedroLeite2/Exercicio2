@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
+import 'buildWidgetConfigureQuestions.dart';
 
 Widget buildWidgetLogin() {
   return const LoginRegisterPage();
@@ -38,6 +39,12 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     if (success) {
       _nameController.clear();
       _passwordController.clear();
+      Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ConfigureQuestionsPage(nomeUtilizador: name),
+      ),
+    );
     }
   }
 
