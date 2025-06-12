@@ -59,11 +59,8 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     }
   }
 
-  void PaginaRegisto() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const Registar()),
-    );
+  void _paginaRegisto() {
+    Navigator.of(context).pushNamed('/register');
   }
 
   InputDecoration _inputDecoration(String label) {
@@ -168,7 +165,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                       ),
                       const SizedBox(width: 10),
                       TextButton(
-                        onPressed: PaginaRegisto,
+                        onPressed: _paginaRegisto,
                         child: const Text(
                           "Registe-se",
                           style: TextStyle(

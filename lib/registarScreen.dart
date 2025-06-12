@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
+import 'package:avaliacaoex2/myexercicioteste_exemplo1.dart';
 
 class Registar extends StatefulWidget {
   const Registar({super.key});
@@ -28,10 +29,7 @@ class _RegistarState extends State<Registar> {
   }
 
   void _paginaLogin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const Registar()),
-    );
+    Navigator.of(context).pushNamed('/login');
   }
 
   InputDecoration _inputDecoration(String label) {
@@ -126,7 +124,7 @@ class _RegistarState extends State<Registar> {
                   TextFormField(
                     controller: _repeatPasswordController,
                     obscureText: true,
-                    decoration: _inputDecoration('Repeat Password'),
+                    decoration: _inputDecoration('Repita a Password'),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter a valid password';
@@ -137,11 +135,12 @@ class _RegistarState extends State<Registar> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 5),
 
                   Row(
                     children: [
                       const Text("Tem conta?", style: TextStyle(fontSize: 18)),
-                      const SizedBox(width: 10),
+
                       TextButton(
                         onPressed: _paginaLogin,
                         child: const Text(
