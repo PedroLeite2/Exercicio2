@@ -1,22 +1,13 @@
 import 'package:avaliacaoex2/buildWidgetQuestions.dart';
 import 'package:flutter/material.dart';
-import 'database_helper.dart';
 
 Widget buildWidgetConfigureQuestions() {
   return const ConfigureQuestionsPage();
 }
 
-Map<int, String> nivel = {
-  1: 'Fácil',
-  2: 'Médio',
-  3: 'Difícil',
-};
+Map<int, String> nivel = {1: 'Fácil', 2: 'Médio', 3: 'Difícil'};
 
-Map<int, String> tipo = {
-  1: 'Endereços',
-  2: 'Sub-redes',
-  3: 'Super-redes',
-};
+Map<int, String> tipo = {1: 'Endereços', 2: 'Sub-redes', 3: 'Super-redes'};
 
 class ConfigureQuestionsPage extends StatefulWidget {
   final String? nomeUtilizador;
@@ -24,8 +15,7 @@ class ConfigureQuestionsPage extends StatefulWidget {
   const ConfigureQuestionsPage({super.key, this.nomeUtilizador});
 
   @override
-  State<ConfigureQuestionsPage> createState() =>
-      _ConfigureQuestionsPageState();
+  State<ConfigureQuestionsPage> createState() => _ConfigureQuestionsPageState();
 }
 
 class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
@@ -38,8 +28,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
       backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 62.0, vertical: 32.0),
+          padding: const EdgeInsets.symmetric(horizontal: 62.0, vertical: 32.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -100,10 +89,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                         child: Container(
                           width: double.infinity,
                           alignment: Alignment.center,
-                          child: Text(
-                            entry.value,
-                            textAlign: TextAlign.center,
-                          ),
+                          child: Text(entry.value, textAlign: TextAlign.center),
                         ),
                       );
                     }).toList(),
@@ -142,10 +128,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                         child: Container(
                           width: double.infinity,
                           alignment: Alignment.center,
-                          child: Text(
-                            entry.value,
-                            textAlign: TextAlign.center,
-                          ),
+                          child: Text(entry.value, textAlign: TextAlign.center),
                         ),
                       );
                     }).toList(),
@@ -167,8 +150,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                     ),
                   ),
                   onPressed: () {
-                    if (_nivelSelecionado != null &&
-                        _tipoSelecionado != null) {
+                    if (_nivelSelecionado != null && _tipoSelecionado != null) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -193,8 +175,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                   },
                   child: const Text(
                     'Começar',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
