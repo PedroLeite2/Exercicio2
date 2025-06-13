@@ -84,9 +84,9 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
       case '/login':
         return MaterialPageRoute(builder: (_) => buildWidgetLogin());
       case '/buildWidgetConfigureQuestions':
-        final nome = settings.arguments as String?;
+        final name = settings.arguments as String?;
         return MaterialPageRoute(
-          builder: (_) => buildWidgetConfigureQuestions(nomeUtilizador: nome),
+          builder: (_) => buildWidgetConfigureQuestions(userName: name),
         );
 
       case '/score':
