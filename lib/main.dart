@@ -5,6 +5,9 @@ import 'package:avaliacaoex2/myexercicioteste_exemplo3.dart';
 import 'registarScreen.dart';
 import 'database_helper.dart';
 
+final ValueNotifier<int> bottomNavIndexNotifier = ValueNotifier<int>(0);
+final ValueNotifier<int> _selectedIndex = bottomNavIndexNotifier;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -42,16 +45,15 @@ class MyExercicioTeste extends StatefulWidget {
 }
 
 class _MyExercicioTesteState extends State<MyExercicioTeste> {
-  int _selectedIndex = 0;
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   String? _nomeUtilizador;
 
   void _onItemTapped(int index) {
-    if (index == _selectedIndex) {
+    if (index == _selectedIndex.value) {
       _navigatorKey.currentState?.popUntil((route) => route.isFirst);
     } else {
       setState(() {
-        _selectedIndex = index;
+        _selectedIndex.value = index;
       });
 
       final routeName = _routeName(index);
@@ -103,7 +105,7 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _navigatorKey.currentState?.pushReplacementNamed(
-        _routeName(_selectedIndex),
+        _routeName(_selectedIndex.value),
         arguments: _nomeUtilizador,
       );
     });
@@ -114,18 +116,29 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title), centerTitle: true),
       body: Navigator(key: _navigatorKey, onGenerateRoute: _onGenerateRoute),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromARGB(255, 68, 91, 166),
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Login/Register',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Questions'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Score'),
-        ],
+      bottomNavigationBar: ValueListenableBuilder<int>(
+        valueListenable: _selectedIndex,
+        builder: (context, value, _) {
+          return BottomNavigationBar(
+            currentIndex: value,
+            selectedItemColor: const Color.fromARGB(255, 68, 91, 166),
+            onTap: _onItemTapped,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.add),
+                label: 'Login/Register',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.list),
+                label: 'Questions',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings),
+                label: 'Score',
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
@@ -53,6 +54,24 @@ class DatabaseHelper {
     return res.isNotEmpty;
   }
 
+  // Guarda o nome do utilizador logado
+  Future<void> saveLoggedUser(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loggedUser', username);
+  }
+
+  // Obtém o utilizador logado (ou null se não houver)
+  Future<String?> getLoggedUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loggedUser');
+  }
+
+  // Opcional: para logout - Se criarmos logout, podemos remover o utilizador logado
+  Future<void> logoutUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('loggedUser');
+  }
+
   Future<int?> getUserScore(String name) async {
     Database db = await instance.database;
     var res = await db.query(
@@ -75,6 +94,16 @@ class DatabaseHelper {
       {columnScore: score},
       where: "$columnName = ?",
       whereArgs: [name],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getTop5Scores() async {
+    final db = await instance.database;
+    return await db.query(
+      tableUsers,
+      columns: [columnName, columnScore],
+      orderBy: "$columnScore DESC",
+      limit: 5,
     );
   }
 }

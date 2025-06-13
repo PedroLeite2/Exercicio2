@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'package:avaliacaoex2/myexercicioteste_exemplo1.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'main.dart';
 
 class Registar extends StatefulWidget {
   const Registar({super.key});
@@ -43,7 +44,7 @@ class _RegistarState extends State<Registar> {
   }
 
   void _paginaLogin() {
-    Navigator.of(context).pushNamed('/login');
+    bottomNavIndexNotifier.value = 0;
   }
 
   InputDecoration _inputDecoration(String label) {
