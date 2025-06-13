@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'buildWidgetConfigureQuestions.dart';
-import 'registarScreen.dart';
 
 Widget buildWidgetLogin() {
   return const LoginRegisterPage();
@@ -27,17 +26,6 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     });
   }
 
-  void _register() async {
-    if (_formKey.currentState?.validate() != true) return;
-
-    final name = _nameController.text.trim();
-    final password = _passwordController.text.trim();
-    await DatabaseHelper.instance.registerUser(name, password);
-    setState(() => _message = "User '$name' registered.");
-    _nameController.clear();
-    _passwordController.clear();
-  }
-
   void _login() async {
     if (_formKey.currentState?.validate() != true) return;
 
@@ -50,13 +38,16 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     if (success) {
       _nameController.clear();
       _passwordController.clear();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ConfigureQuestionsPage(nomeUtilizador: name),
-        ),
-      );
+      _paginaConfigurarQuestoes(name);
     }
+  }
+
+  void _paginaConfigurarQuestoes(String nome) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ConfigureQuestionsPage(nomeUtilizador: nome),
+      ),
+    );
   }
 
   void _paginaRegisto() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'package:avaliacaoex2/myexercicioteste_exemplo1.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class Registar extends StatefulWidget {
   const Registar({super.key});
@@ -23,9 +24,22 @@ class _RegistarState extends State<Registar> {
     final name = _nameController.text.trim();
     final password = _passwordController.text.trim();
     await DatabaseHelper.instance.registerUser(name, password);
-    setState(() => _message = "User '$name' registered.");
+
     _nameController.clear();
     _passwordController.clear();
+
+    Flushbar(
+      messageText: Text(
+        "User '$name' registered.",
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 18, color: Colors.black),
+      ),
+      backgroundColor: const Color.fromARGB(255, 195, 199, 234),
+      duration: const Duration(seconds: 2),
+      flushbarPosition: FlushbarPosition.TOP,
+      margin: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(8),
+    ).show(context);
   }
 
   void _paginaLogin() {

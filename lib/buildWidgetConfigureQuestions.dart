@@ -1,8 +1,8 @@
 import 'package:avaliacaoex2/buildWidgetQuestions.dart';
 import 'package:flutter/material.dart';
 
-Widget buildWidgetConfigureQuestions() {
-  return const ConfigureQuestionsPage();
+Widget buildWidgetConfigureQuestions({String? nomeUtilizador}) {
+  return ConfigureQuestionsPage(nomeUtilizador: nomeUtilizador);
 }
 
 Map<int, String> nivel = {1: 'Fácil', 2: 'Médio', 3: 'Difícil'};

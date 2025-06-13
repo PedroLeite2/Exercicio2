@@ -1,8 +1,37 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:avaliacaoex2/myexercicioteste_exemplo1.dart';
 import 'package:avaliacaoex2/buildWidgetConfigureQuestions.dart';
 import 'package:avaliacaoex2/myexercicioteste_exemplo3.dart';
 import 'registarScreen.dart';
+import 'database_helper.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await DatabaseHelper.instance.database;
+  } catch (e) {
+    print('DB init error: $e');
+  }
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'ExercicioTeste',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 68, 91, 166),
+        ),
+        useMaterial3: true,
+      ),
+      home: const MyExercicioTeste(title: 'Redes & Companhia'),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
 
 class MyExercicioTeste extends StatefulWidget {
   final String title;
@@ -15,17 +44,24 @@ class MyExercicioTeste extends StatefulWidget {
 class _MyExercicioTesteState extends State<MyExercicioTeste> {
   int _selectedIndex = 0;
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  String? _nomeUtilizador;
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) {
-      // Optional: pop to first route on tab re-tap
       _navigatorKey.currentState?.popUntil((route) => route.isFirst);
     } else {
       setState(() {
         _selectedIndex = index;
       });
+
+      final routeName = _routeName(index);
+      final args = (routeName == '/ConfigureQuestionsPage')
+          ? _nomeUtilizador
+          : null;
+
       _navigatorKey.currentState?.pushReplacementNamed(
-        _routeName(_selectedIndex),
+        routeName,
+        arguments: args,
       );
     }
   }
@@ -35,7 +71,7 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
       case 0:
         return '/login';
       case 1:
-        return '/questions';
+        return '/ConfigureQuestionsPage';
       case 2:
         return '/score';
       default:
@@ -47,10 +83,12 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
     switch (settings.name) {
       case '/login':
         return MaterialPageRoute(builder: (_) => buildWidgetLogin());
-      case '/questions':
+      case '/ConfigureQuestionsPage':
+        final nome = settings.arguments as String?;
         return MaterialPageRoute(
-          builder: (_) => buildWidgetConfigureQuestions(),
+          builder: (_) => buildWidgetConfigureQuestions(nomeUtilizador: nome),
         );
+
       case '/score':
         return MaterialPageRoute(builder: (_) => buildWidgetSettings());
       case '/register': // your extra page
@@ -63,10 +101,10 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
   @override
   void initState() {
     super.initState();
-    // start with initial route
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _navigatorKey.currentState?.pushReplacementNamed(
         _routeName(_selectedIndex),
+        arguments: _nomeUtilizador,
       );
     });
   }
@@ -91,4 +129,4 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
       ),
     );
   }
-}
+}*/
