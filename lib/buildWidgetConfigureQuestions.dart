@@ -2,9 +2,10 @@ import 'package:avaliacaoex2/buildWidgetQuestions.dart';
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 
-Widget buildWidgetConfigureQuestions() {
-  return const ConfigureQuestionsPage();
+Widget buildWidgetConfigureQuestions({String? nomeUtilizador}) {
+  return ConfigureQuestionsPage(nomeUtilizador: nomeUtilizador);
 }
+
 
 Map<int, String> nivel = {
   1: 'Fácil',
@@ -36,7 +37,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
     return Scaffold(
       body: Stack(
         children: [
-       
+          // Fundo com imagem
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -46,12 +47,12 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
             ),
           ),
 
-          
+          // Overlay escuro para legibilidade
           Container(
             color: Colors.black.withOpacity(0.3),
           ),
 
-         
+          // Conteúdo principal
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
             child: Column(
@@ -184,7 +185,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white, 
+                        color: Colors.white, // MUITO IMPORTANTE PARA VISIBILIDADE
                       ),
                     ),
                   ),
