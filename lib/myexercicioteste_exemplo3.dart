@@ -26,6 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _paginaLogin() {
     bottomNavIndexNotifier.value = 0;
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   ButtonStyle _buttonStyle() {
@@ -45,6 +46,7 @@ class _SettingsPageState extends State<SettingsPage> {
       setState(() {
         _userName = user;
         _score = score ?? 0;
+        _topScores = topScores;
       });
     } else {
       setState(() {
@@ -103,7 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: const TextStyle(fontSize: 18),
                     ),
                     trailing: Text(
-                      '${user['score']} pts',
+                      '${user['score']} pontos',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -128,25 +130,82 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildLoggedInScreen() {
+  Widget _buildLoggedInScreen(String username, int score) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Score Manager")),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Olá, $_userName!", style: const TextStyle(fontSize: 20)),
-            const SizedBox(height: 20),
-            const Text("Score", style: TextStyle(fontSize: 24)),
-            const SizedBox(height: 10),
-            Text('$_score', style: const TextStyle(fontSize: 32)),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _checkLoginAndLoadScore,
-              child: const Text('Atualizar Score'),
+      body: Column(
+        children: [
+          const SizedBox(height: 50),
+          ListTile(
+            leading: const CircleAvatar(
+              backgroundColor: Colors.blue,
+              child: Icon(Icons.person, color: Colors.white),
             ),
-          ],
-        ),
+            title: Text(
+              username,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              'Score: $score pontos',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
+          const SizedBox(height: 40),
+          ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: [
+                Color.fromARGB(255, 212, 208, 203),
+                Color.fromARGB(255, 81, 30, 233),
+                Color.fromARGB(255, 225, 0, 255),
+              ],
+            ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+            child: const Text(
+              "Leaderboard",
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    blurRadius: 8,
+                    color: Colors.black26,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.4,
+            child: ListView.builder(
+              itemCount: _topScores.length,
+              itemBuilder: (context, index) {
+                final user = _topScores[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(child: Text('${index + 1}')),
+                    title: Text(
+                      user['name'],
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    trailing: Text(
+                      '${user['score']} pontos',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -155,6 +214,6 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return _userName == null
         ? _buildNotLoggedInScreen(_topScores)
-        : _buildLoggedInScreen();
+        : _buildLoggedInScreen(_userName!, _score);
   }
 }

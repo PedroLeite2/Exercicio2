@@ -19,11 +19,24 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   String _message = "";
   bool rememberMe = false;
+  bool isThereAnUser = true;
 
   void onChanged(bool? value) {
     setState(() {
       rememberMe = value ?? false;
+      _checkIfAlreadyLoggedIn();
     });
+  }
+
+  Future<void> _checkIfAlreadyLoggedIn() async {
+    final user = await DatabaseHelper.instance.getLoggedUser();
+    if (user != null) {
+      isThereAnUser = true;
+    } else {
+      setState(() {
+        isThereAnUser = false;
+      });
+    }
   }
 
   void _login() async {
@@ -36,6 +49,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
       () => _message = success ? "Login successful!" : "Invalid credentials.",
     );
     if (success) {
+      await DatabaseHelper.instance.saveLoggedUser(name);
       _nameController.clear();
       _passwordController.clear();
       _paginaConfigurarQuestoes(name);
@@ -101,11 +115,8 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
               ),
             ),
           ),
-          
           // Dark overlay for better readability
-          Container(
-            color: Colors.black.withOpacity(0.3),
-          ),
+          Container(color: Colors.black.withOpacity(0.3)),
 
           SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
@@ -119,11 +130,13 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 60),
-                      
+
                       // Enhanced "Bem Vindo" title
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
@@ -193,10 +206,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                         children: [
                           const Text(
                             "Não tem conta?",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
+                            style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                           const SizedBox(width: 10),
                           TextButton(
