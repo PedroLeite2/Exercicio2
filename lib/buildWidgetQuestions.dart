@@ -9,13 +9,13 @@ class Pergunta {
 }
 
 class QuestionsPage extends StatefulWidget {
-  final int nivelSelecionado;
-  final int tipoSelecionado;
+  final String nameUser;
+  final int selectedType;
 
   const QuestionsPage({
     super.key,
-    required this.nivelSelecionado,
-    required this.tipoSelecionado,
+    required this.nameUser,
+    required this.selectedType,
   });
 
   @override
@@ -23,28 +23,119 @@ class QuestionsPage extends StatefulWidget {
 }
 
 class _QuestionsPageState extends State<QuestionsPage> {
-  late Pergunta perguntaAtual;
+int indexPergunta=1;
+
   final TextEditingController _controller = TextEditingController();
-  String feedback = '';
+ 
+void count(){
+  setState(() {
+    
+     indexPergunta++;
+  
+  });
+ 
+}
+int type(){
+int type = widget.selectedType;
+return type;
+}
+  
+
+  String createQuestion( int pergunta) {
+  
+    int prefixo = createMaskRandom(type());
+    String ip1 = createIpRandomEnderecos(prefixo);
+    String ip2 = createIpRandomEnderecos(prefixo);
+
+    return questionTemplate(
+      ip1: ip1,
+      ip2: ip2,
+      prefixo: prefixo,
+      pergunta: pergunta,
+    );
+  }
+
+  String questionTemplate({
+    required String ip1,
+    String? ip2,
+    required int prefixo,
+    required int pergunta,
+  }) {
+    switch (pergunta) {
+      case 1:
+        return 'Qual é o Network ID do endereço IP $ip1 com máscara /$prefixo?';
+      case 2:
+        return 'Qual é o Broadcast do endereço IP $ip1 com máscara /$prefixo?';
+      case 3:
+        return 'Os endereços IPs $ip1 e $ip2 estão no mesmo segmento de rede com máscara /$prefixo?';
+      default:
+        return 'Sem pergunta disponível.';
+    }
+  }
+  /*Classe A: 10.0.0.0 a 10.255.255.255 //pergunta 2
+
+Classe B: 172.16.0.0 a 172.31.255.255 //pergunta 3
+
+Classe C: 192.168.0.0 a 192.168.255.255*/ //pergunta 1
+
+  String createIpRandomEnderecos(int classe) {
+    switch (classe) {
+      case 8:
+        return '10.${Random().nextInt(256)}.${Random().nextInt(256)}.${1 + Random().nextInt(254)}';
+      case 16:
+        return '172.${16 + Random().nextInt(16)}.${Random().nextInt(256)}.${1 + Random().nextInt(254)}';
+      case 24:
+        return '192.168.${Random().nextInt(256)}.${1 + Random().nextInt(254)}';
+      default:
+        return '';
+    }
+  }
+
+  String createIpRandomSubRedes(int prefixo) {
+    switch (prefixo) {
+      case 8-30:
+        return '10.${Random().nextInt(256)}.${Random().nextInt(256)}.${Random().nextInt(256)}';
+      case 16-23:
+        return '172.${16 + Random().nextInt(16)}.${Random().nextInt(256)}.${Random().nextInt(256)}';
+      case 24-30:
+        return '192.168.${Random().nextInt(256)}.${Random().nextInt(256)}';
+      default:
+        return '';
+    }
+  }
+
+  String createIpRandomSuperRedes(int classe) {
+    switch (classe) {
+      case 1:
+        return '10.${Random().nextInt(256)}.${Random().nextInt(256)}.${Random().nextInt(256)}';
+      case 2:
+        return '172.${16 + Random().nextInt(16)}.${Random().nextInt(256)}.${Random().nextInt(256)}';
+      case 3:
+        return '192.168.${Random().nextInt(256)}.${Random().nextInt(256)}';
+      default:
+        return '';
+    }
+  }
+
+  int createMaskRandom(int type) {
+    int mask = 0; // Default to Class C
+    if (type == 1) {
+      List<int> prefixes = [8, 16, 24];
+
+      mask = prefixes[Random().nextInt(prefixes.length)];
+    } else {
+      mask = 8 + Random().nextInt(23);
+    }
+    return mask;
+  }
 
   @override
   void initState() {
     super.initState();
-    perguntaAtual = gerarPergunta(widget.nivelSelecionado, widget.tipoSelecionado);
+    
   }
 
-  void verificarResposta() {
-    String respostaUser = _controller.text.trim();
-    if (respostaUser.toLowerCase() == perguntaAtual.resposta.toLowerCase()) {
-      setState(() {
-        feedback = '✅ Resposta correta!';
-      });
-    } else {
-      setState(() {
-        feedback = '❌ Resposta errada. A correta era: ${perguntaAtual.resposta}';
-      });
-    }
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +161,34 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Visibility(visible:indexPergunta==1 ,
+                        child: 
+
                       Text(
-                        perguntaAtual.texto,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                      ),
+                        createQuestion(1),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),),
+                      Visibility(visible:indexPergunta==2,
+                      child: 
+                      Text(
+                        createQuestion(2),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),),
+                      Visibility(visible:indexPergunta==3,
+                      child: 
+                      Text(
+                        createQuestion(3),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),),
                       const SizedBox(height: 20),
                       TextField(
                         controller: _controller,
@@ -86,9 +201,18 @@ class _QuestionsPageState extends State<QuestionsPage> {
                           filled: true,
                         ),
                       ),
+                      Visibility(visible:indexPergunta==4,
+                      child: 
+                      Text(
+                        'Resultado',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),),
                       const SizedBox(height: 20),
                       ElevatedButton.icon(
-                        onPressed: verificarResposta,
+                        onPressed: count,
                         icon: const Icon(Icons.check_circle),
                         label: const Text('Verificar'),
                         style: ElevatedButton.styleFrom(
@@ -100,18 +224,11 @@ class _QuestionsPageState extends State<QuestionsPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        feedback,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: feedback.startsWith('✅') ? Colors.green : Colors.red,
-                        ),
-                      ),
+                      
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -120,88 +237,3 @@ class _QuestionsPageState extends State<QuestionsPage> {
   }
 }
 
-Pergunta gerarPergunta(int nivel, int tipo) {
-  if (nivel == 1 && tipo == 1) return gerarPerguntaNivel1();
-  if (nivel == 2 && tipo == 2) return gerarPerguntaCompararIPs(24);
-  if (nivel == 3 && tipo == 3) return gerarPerguntaCompararIPs(20);
-  return Pergunta(texto: 'Sem pergunta disponível.', resposta: '');
-}
-
-Pergunta gerarPerguntaNivel1() {
-  final random = Random();
-  int classe = random.nextInt(3);
-  int ip1 = classe == 0 ? 10 : classe == 1 ? 172 : 192;
-  int ip2 = classe == 1 ? (16 + random.nextInt(16)) : random.nextInt(256);
-  int ip3 = random.nextInt(256);
-  int ip4 = random.nextInt(256);
-  String ip = '$ip1.$ip2.$ip3.$ip4';
-
-  List<int> prefixos = [8, 16, 24];
-  int prefixo = prefixos[random.nextInt(prefixos.length)];
-  String mascara = prefixoToMascara(prefixo);
-
-  bool isNetwork = random.nextBool();
-  String resposta = isNetwork
-      ? calcularNetworkID(ip, mascara)
-      : calcularBroadcast(ip, mascara);
-  String texto = isNetwork
-      ? 'Qual é o Network ID do endereço IP $ip com máscara /$prefixo?'
-      : 'Qual é o Broadcast do endereço IP $ip com máscara /$prefixo?';
-  return Pergunta(texto: texto, resposta: resposta);
-}
-
-Pergunta gerarPerguntaCompararIPs(int prefixo) {
-  final ip1 = gerarIpPrivado();
-  final ip2 = gerarIpPrivado();
-  final mascara = prefixoToMascara(prefixo);
-
-  final net1 = calcularNetworkID(ip1, mascara);
-  final net2 = calcularNetworkID(ip2, mascara);
-  final mesmaRede = net1 == net2;
-
-  return Pergunta(
-    texto: 'Os endereços $ip1 e $ip2 estão na mesma rede com máscara /$prefixo?',
-    resposta: mesmaRede ? 'Sim' : 'Não',
-  );
-}
-
-String gerarIpPrivado() {
-  final random = Random();
-  int classe = random.nextInt(3);
-  int ip1 = classe == 0 ? 10 : classe == 1 ? 172 : 192;
-  int ip2 = classe == 1 ? (16 + random.nextInt(16)) : random.nextInt(256);
-  int ip3 = random.nextInt(256);
-  int ip4 = random.nextInt(256);
-  return '$ip1.$ip2.$ip3.$ip4';
-}
-
-String prefixoToMascara(int prefixo) {
-  int fullOctets = prefixo ~/ 8;
-  int remainingBits = prefixo % 8;
-
-  List<int> octets = List.filled(4, 0);
-  for (int i = 0; i < fullOctets; i++) {
-    octets[i] = 255;
-  }
-  if (remainingBits > 0 && fullOctets < 4) {
-    octets[fullOctets] = 256 - (1 << (8 - remainingBits));
-  }
-  return octets.join('.');
-}
-
-String calcularNetworkID(String ip, String mascara) {
-  List<int> ipOctets = ip.split('.').map(int.parse).toList();
-  List<int> maskOctets = mascara.split('.').map(int.parse).toList();
-  List<int> network = List.generate(4, (i) => ipOctets[i] & maskOctets[i]);
-  return network.join('.');
-}
-
-String calcularBroadcast(String ip, String mascara) {
-  List<int> ipOctets = ip.split('.').map(int.parse).toList();
-  List<int> maskOctets = mascara.split('.').map(int.parse).toList();
-  List<int> broadcast = List.generate(
-    4,
-    (i) => (ipOctets[i] & maskOctets[i]) | (~maskOctets[i] & 0xFF),
-  );
-  return broadcast.join('.');
-}

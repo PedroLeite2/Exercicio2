@@ -1,22 +1,13 @@
 import 'package:avaliacaoex2/buildWidgetQuestions.dart';
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
+import 'buildWidgetQuestions.dart';
 
 Widget buildWidgetConfigureQuestions({String? userName}) {
   return ConfigureQuestionsPage(userName: userName);
 }
 
-Map<int, String> levelMap = {
-  1: 'Fácil',
-  2: 'Médio',
-  3: 'Difícil',
-};
-
-Map<int, String> typeMap = {
-  1: 'Endereços',
-  2: 'Sub-redes',
-  3: 'Super-redes',
-};
+Map<int, String> typeMap = {1: 'Endereços', 2: 'Sub-redes', 3: 'Super-redes'};
 
 class ConfigureQuestionsPage extends StatefulWidget {
   final String? userName;
@@ -28,7 +19,6 @@ class ConfigureQuestionsPage extends StatefulWidget {
 }
 
 class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
-  int? _selectedLevel;
   int? _selectedType;
 
   @override
@@ -40,16 +30,16 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/background_conf_questions.jpg'),
+                image: AssetImage(
+                  'assets/images/background_conf_questions.jpg',
+                ),
                 fit: BoxFit.cover,
               ),
             ),
           ),
 
           // Overlay escuro para melhor legibilidade
-          Container(
-            color: Colors.black.withOpacity(0.3),
-          ),
+          Container(color: Colors.black.withOpacity(0.3)),
 
           // Conteúdo principal
           SafeArea(
@@ -68,7 +58,9 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
@@ -93,7 +85,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
 
                   // Título
                   const Text(
-                    'Configurar Questões',
+                    'Selecione o tipo de questão',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 32,
@@ -103,16 +95,9 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+     
 
-                  const Text(
-                    'Personalize a sua experiência de quiz',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color.fromARGB(255, 255, 255, 255),
-                    ),
-                  ),
+                 
 
                   const SizedBox(height: 40),
 
@@ -121,16 +106,6 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          _buildSelectionCard(
-                            title: 'Nível de Dificuldade',
-                            hint: 'Escolha o nível',
-                            value: _selectedLevel,
-                            options: levelMap,
-                            icon: Icons.speed,
-                            onChanged: (value) =>
-                                setState(() => _selectedLevel = value),
-                          ),
-
                           const SizedBox(height: 24),
 
                           _buildSelectionCard(
@@ -151,7 +126,9 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.amber.shade600,
-                                padding: const EdgeInsets.symmetric(vertical: 18),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 18,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -159,13 +136,13 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                                 shadowColor: Colors.black.withOpacity(0.3),
                               ),
                               onPressed: () {
-                                if (_selectedLevel != null && _selectedType != null) {
+                                if (_selectedType != null) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => QuestionsPage(
-                                        nivelSelecionado: _selectedLevel!,
-                                        tipoSelecionado: _selectedType!,
+                                        nameUser: widget.userName!,
+                                        selectedType: _selectedType!,
                                       ),
                                     ),
                                   );
@@ -178,7 +155,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                                       ),
                                       backgroundColor: Colors.red.shade400,
                                       content: const Text(
-                                        'Por favor, selecione o nível e o tipo!',
+                                        'Por favor, selecione o tipo!',
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
@@ -218,9 +195,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
   }) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: Colors.white.withOpacity(0.85),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -229,11 +204,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
           children: [
             Row(
               children: [
-                Icon(
-                  icon,
-                  color: Colors.blue.shade700,
-                  size: 24,
-                ),
+                Icon(icon, color: Colors.blue.shade700, size: 24),
                 const SizedBox(width: 8),
                 Text(
                   title,
@@ -251,10 +222,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1.5,
-                ),
+                border: Border.all(color: Colors.grey.shade300, width: 1.5),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
@@ -264,7 +232,10 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                     hint,
                     style: TextStyle(color: Colors.grey.shade600),
                   ),
-                  icon: Icon(Icons.arrow_drop_down, color: Colors.grey.shade600),
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.grey.shade600,
+                  ),
                   iconSize: 28,
                   dropdownColor: Colors.white,
                   style: TextStyle(
