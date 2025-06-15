@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:avaliacaoex2/myexercicioteste_exemplo1.dart';
-import 'package:avaliacaoex2/buildWidgetConfigureQuestions.dart';
-import 'package:avaliacaoex2/myexercicioteste_exemplo3.dart';
-import 'registarScreen.dart';
+import 'package:avaliacaoex2/login_widget.dart';
+import 'package:avaliacaoex2/configure_questions_widget.dart';
+import 'package:avaliacaoex2/scrore_widget.dart';
+import 'register_widget.dart';
 import 'database_helper.dart';
 
 final ValueNotifier<int> bottomNavIndexNotifier = ValueNotifier<int>(0);
@@ -125,15 +125,15 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
             onTap: _onItemTapped,
             items: const [
               BottomNavigationBarItem(
-                icon: Icon(Icons.add),
+                icon: Icon(Icons.person), // Ícone de perfil para Login/Register
                 label: 'Login/Register',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.list),
+                icon: Icon(Icons.quiz), // Ícone de questionário para Questions
                 label: 'Questions',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
+                icon: Icon(Icons.leaderboard), // Ícone de placar para Score
                 label: 'Score',
               ),
             ],

@@ -1,7 +1,7 @@
-import 'package:avaliacaoex2/buildWidgetQuestions.dart';
+import 'package:avaliacaoex2/questions_widget.dart';
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
-import 'buildWidgetQuestions.dart';
+import 'questions_widget.dart';
 
 Widget buildWidgetConfigureQuestions({String? userName}) {
   return ConfigureQuestionsPage(userName: userName);

@@ -1,71 +1,49 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
-import 'buildWidgetConfigureQuestions.dart';
+import 'package:avaliacaoex2/login_widget.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'main.dart';
 
-Widget buildWidgetLogin() {
-  return const LoginRegisterPage();
-}
-
-class LoginRegisterPage extends StatefulWidget {
-  const LoginRegisterPage({super.key});
+class Registar extends StatefulWidget {
+  const Registar({super.key});
 
   @override
-  State<LoginRegisterPage> createState() => _LoginRegisterPageState();
+  State<Registar> createState() => _RegistarState();
 }
 
-class _LoginRegisterPageState extends State<LoginRegisterPage> {
+class _RegistarState extends State<Registar> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatPasswordController = TextEditingController();
   String _message = "";
-  bool rememberMe = false;
-  bool isThereAnUser = true;
 
-  void onChanged(bool? value) {
-    setState(() {
-      rememberMe = value ?? false;
-      _checkIfAlreadyLoggedIn();
-    });
-  }
-
-  Future<void> _checkIfAlreadyLoggedIn() async {
-    final user = await DatabaseHelper.instance.getLoggedUser();
-    if (user != null) {
-      isThereAnUser = true;
-    } else {
-      setState(() {
-        isThereAnUser = false;
-      });
-    }
-  }
-
-  void _login() async {
+  void _register() async {
     if (_formKey.currentState?.validate() != true) return;
 
     final name = _nameController.text.trim();
     final password = _passwordController.text.trim();
-    bool success = await DatabaseHelper.instance.loginUser(name, password);
-    setState(
-      () => _message = success ? "Login successful!" : "Invalid credentials.",
-    );
-    if (success) {
-      await DatabaseHelper.instance.saveLoggedUser(name);
-      _nameController.clear();
-      _passwordController.clear();
-      _paginaConfigurarQuestoes(name);
-    }
-  }
+    await DatabaseHelper.instance.registerUser(name, password);
 
-  void _paginaConfigurarQuestoes(String name) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ConfigureQuestionsPage(userName: name),
+    _nameController.clear();
+    _passwordController.clear();
+
+    Flushbar(
+      messageText: Text(
+        "User '$name' registered.",
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 18, color: Colors.black),
       ),
-    );
+      backgroundColor: const Color.fromARGB(255, 195, 199, 234),
+      duration: const Duration(seconds: 2),
+      flushbarPosition: FlushbarPosition.TOP,
+      margin: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(8),
+    ).show(context);
   }
 
-  void _paginaRegisto() {
-    Navigator.of(context).pushNamed('/register');
+  void _paginaLogin() {
+    bottomNavIndexNotifier.value = 0;
   }
 
   InputDecoration _inputDecoration(String label) {
@@ -106,7 +84,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image changed to redes.png
+          // Background image
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -131,7 +109,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                     children: [
                       const SizedBox(height: 60),
 
-                      // Enhanced "Bem Vindo" title
+                      // Title with the same style as login page
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
@@ -148,7 +126,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                           ],
                         ),
                         child: Text(
-                          "Bem Vindo",
+                          "Registo",
                           style: TextStyle(
                             fontSize: 42,
                             fontWeight: FontWeight.bold,
@@ -190,29 +168,35 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                           return null;
                         },
                       ),
-                      CheckboxListTile(
-                        value: rememberMe,
-                        onChanged: onChanged,
-                        title: const Text(
-                          "Lembrar-me",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        controlAffinity: ListTileControlAffinity.leading,
-                        activeColor: Colors.amber.shade600,
-                        checkColor: Colors.white,
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: _repeatPasswordController,
+                        style: const TextStyle(color: Colors.white),
+                        obscureText: true,
+                        decoration: _inputDecoration('Repita a Password'),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Por favor insira uma password válida';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'As passwords não coincidem';
+                          }
+                          return null;
+                        },
                       ),
+                      const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            "Não tem conta?",
+                            "Já tem conta?",
                             style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                           const SizedBox(width: 10),
                           TextButton(
-                            onPressed: _paginaRegisto,
+                            onPressed: _paginaLogin,
                             child: const Text(
-                              "Registe-se",
+                              "Faça Login Aqui",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.amber,
@@ -226,106 +210,9 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _login,
+                          onPressed: _register,
                           style: _buttonStyle(),
-                          child: const Text("Login"),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.white.withOpacity(0.3),
-                              endIndent: 10,
-                            ),
-                          ),
-                          Text(
-                            'ou',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white.withOpacity(0.7),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.white.withOpacity(0.3),
-                              indent: 10,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 14,
-                              horizontal: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 3,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/images/google.png',
-                                height: 24,
-                                width: 24,
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Login com Google',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 14,
-                              horizontal: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 3,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/images/microsoft.png',
-                                height: 24,
-                                width: 24,
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Login com Microsoft',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
+                          child: const Text("Registar"),
                         ),
                       ),
                       const SizedBox(height: 20),
