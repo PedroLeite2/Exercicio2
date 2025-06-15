@@ -20,18 +20,27 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   String _message = "";
   bool rememberMe = false;
   bool isThereAnUser = true;
+  String username = "";
 
   void onChanged(bool? value) {
     setState(() {
       rememberMe = value ?? false;
-      _checkIfAlreadyLoggedIn();
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfAlreadyLoggedIn();
   }
 
   Future<void> _checkIfAlreadyLoggedIn() async {
     final user = await DatabaseHelper.instance.getLoggedUser();
     if (user != null) {
-      isThereAnUser = true;
+      setState(() {
+        username = user;
+        isThereAnUser = true;
+      });
     } else {
       setState(() {
         isThereAnUser = false;
@@ -101,8 +110,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget screenNotLoggedIn() {
     return Scaffold(
       body: Stack(
         children: [
@@ -346,5 +354,81 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
         ],
       ),
     );
+  }
+
+  Widget screenLoggedIn(String userName) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/redes.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Container(color: Colors.black.withOpacity(0.3)),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Bem-vindo, $userName!",
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 10,
+                            color: Colors.black54,
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 40),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/home');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber.shade600,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 32,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 5,
+                        shadowColor: Colors.black.withOpacity(0.3),
+                        textStyle: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      child: const Text("Começar Jogo"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return isThereAnUser ? screenLoggedIn(username) : screenNotLoggedIn();
   }
 }
