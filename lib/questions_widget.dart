@@ -1,5 +1,7 @@
 import 'dart:math';
+import 'package:avaliacaoex2/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:diacritic/diacritic.dart';
 
 class Pergunta {
   final String texto;
@@ -26,26 +28,38 @@ class _QuestionsPageState extends State<QuestionsPage> {
   int indexPergunta = 1;
   String respostaCorreta = '';
   final TextEditingController _controller = TextEditingController();
+  int corretas = 0;
   int score = 0;
   bool showResult = false;
   final formKey = GlobalKey<FormState>();
+  bool valido = false;
 
-  void count() {
-    if (_controller.text.trim().toLowerCase() ==
-        respostaCorreta.toLowerCase()) {
-      setState(() {
-        score++;
-      });
-    }
+  int pontuacao(bool resposta) {
+    return (type() * (resposta ? 10 : -5));
+  }
 
-    if (indexPergunta < 3) {
+  Future<int?> atualizarScore() async {
+    await DatabaseHelper.instance.updateUserScore(widget.nameUser!, score);
+    return await DatabaseHelper.instance.getUserScore(widget.nameUser!);
+  }
+
+  void confirmar() async {
+    bool estaCerta =
+        removeDiacritics(_controller.text.trim().toLowerCase()) ==
+        respostaCorreta.toLowerCase();
+
+    setState(() {
+      score += pontuacao(estaCerta);
+      if (estaCerta) corretas++;
+      indexPergunta++;
+      _controller.clear();
+    });
+
+    if (indexPergunta > 3) {
+      showResult = true;
+      int? tempScore = await atualizarScore();
       setState(() {
-        indexPergunta++;
-        _controller.clear();
-      });
-    } else {
-      setState(() {
-        showResult = true;
+        score = tempScore!;
       });
     }
   }
@@ -71,7 +85,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
   String createQuestion(int pergunta) {
     final int t = type();
     final int prefixo = createMaskRandom(t);
-    String ip1;
+    String ip1 = '';
     String? ip2;
 
     if (pergunta == 1) {
@@ -83,11 +97,20 @@ class _QuestionsPageState extends State<QuestionsPage> {
       String networkId = calculateNetworkId(ip1, prefixo);
       respostaCorreta = calculateBroadcastAddress(networkId, prefixo);
     } else if (pergunta == 3) {
+      bool verdadeira = Random().nextInt(2) == 1;
       ip1 = createIpRandomSuperRedes();
-      ip2 = generateIpInSameSubnet(ip1, prefixo);
-      respostaCorreta = 'sim'; // Resposta fixa para pergunta 3
-    } else {
-      throw ArgumentError('Tipo inválido: $t');
+
+      if (verdadeira) {
+        ip2 = generateIpInSameSubnet(ip1, prefixo);
+        respostaCorreta = 'sim';
+      } else {
+        String networkId = calculateNetworkId(ip1, prefixo);
+        ip2 = createIpRandomSuperRedes();
+        while (networkId == calculateNetworkId(ip2!, prefixo)) {
+          ip2 = createIpRandomSuperRedes();
+        }
+        respostaCorreta = 'nao';
+      }
     }
 
     return questionTemplate(
@@ -170,46 +193,32 @@ class _QuestionsPageState extends State<QuestionsPage> {
   }
 
   String createIpRandomSubRedes(int prefixo) {
+    List<int> octets;
     if (prefixo <= 15) {
-      List<int> octets = [
+      octets = [
         10,
         Random().nextInt(256),
         Random().nextInt(256),
         Random().nextInt(256),
       ];
-      for (int i = 0; i < 32 - min(prefixo, 30); i++) {
-        int octetIndex = 3 - (i ~/ 8);
-        int bitPosition = i % 8;
-        octets[octetIndex] &= ~(1 << bitPosition);
-      }
-      return octets.join('.');
     } else if (prefixo <= 23) {
-      List<int> octets = [
+      octets = [
         172,
         16 + Random().nextInt(16),
         Random().nextInt(256),
         Random().nextInt(256),
       ];
-      for (int i = 0; i < 32 - min(prefixo, 30); i++) {
-        int octetIndex = 3 - (i ~/ 8);
-        int bitPosition = i % 8;
-        octets[octetIndex] &= ~(1 << bitPosition);
-      }
-      return octets.join('.');
     } else {
-      List<int> octets = [
-        192,
-        168,
-        Random().nextInt(256),
-        Random().nextInt(256),
-      ];
-      for (int i = 0; i < 32 - min(prefixo, 30); i++) {
-        int octetIndex = 3 - (i ~/ 8);
-        int bitPosition = i % 8;
-        octets[octetIndex] &= ~(1 << bitPosition);
-      }
-      return octets.join('.');
+      octets = [192, 168, Random().nextInt(256), Random().nextInt(256)];
     }
+
+    for (int i = 0; i < 32 - min(prefixo, 30); i++) {
+      int octetIndex = 3 - (i ~/ 8);
+      int bitPosition = i % 8;
+      octets[octetIndex] &= ~(1 << bitPosition);
+    }
+
+    return octets.join('.');
   }
 
   String createIpRandomSuperRedes() {
@@ -237,7 +246,6 @@ class _QuestionsPageState extends State<QuestionsPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Imagem de fundo
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -248,17 +256,13 @@ class _QuestionsPageState extends State<QuestionsPage> {
               ),
             ),
           ),
-
-          // Overlay escuro
           Container(color: Colors.black.withOpacity(0.3)),
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Cabeçalho com nome do usuário e botão de voltar
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -290,81 +294,176 @@ class _QuestionsPageState extends State<QuestionsPage> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Indicador de progresso
-                  LinearProgressIndicator(
-                    value: indexPergunta / 3,
-                    backgroundColor: Colors.white.withOpacity(0.2),
-                    color: Colors.amber,
-                    minHeight: 8,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-
-                  const SizedBox(height: 8),
-                  Text(
-                    'Questão $indexPergunta de 3',
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-
+                  if (showResult) ...[
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      color: Colors.white.withOpacity(0.85),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: ListTile(
+                          leading: const CircleAvatar(
+                            backgroundColor: Colors.amber,
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                          title: Text(
+                            widget.nameUser!,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Score: $score pontos',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.blueGrey,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    LinearProgressIndicator(
+                      value: indexPergunta / 3,
+                      backgroundColor: Colors.white.withOpacity(0.2),
+                      color: Colors.amber,
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Questão $indexPergunta de 3',
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ],
                   const SizedBox(height: 30),
-
-                  // Card da pergunta
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            color: Colors.white.withOpacity(0.85),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Form(
-                                key: formKey,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (!showResult) ...[
-                                      Text(
-                                        createQuestion(indexPergunta),
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
+                          SizedBox(
+                            width: double.infinity,
+                            child: Card(
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              color: Colors.white.withOpacity(0.85),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Form(
+                                  key: formKey,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      if (!showResult) ...[
+                                        Text(
+                                          createQuestion(indexPergunta),
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey.shade800,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      TextFormField(
-                                        controller: _controller,
-                                        decoration: InputDecoration(
-                                          labelText: 'Sua resposta',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
+                                        Text(
+                                          respostaCorreta,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        TextFormField(
+                                          controller: _controller,
+                                          decoration: InputDecoration(
+                                            labelText: 'Sua resposta',
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            filled: true,
+                                            fillColor: Colors.grey.shade50,
+                                          ),
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Por favor, insira sua resposta.';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                        const SizedBox(height: 20),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              if (formKey.currentState !=
+                                                      null &&
+                                                  formKey.currentState!
+                                                      .validate()) {
+                                                confirmar();
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Colors.amber.shade600,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 16,
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              'Confirmar',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
                                             ),
                                           ),
-                                          filled: true,
-                                          fillColor: Colors.grey.shade50,
                                         ),
-                                        validator: (value) =>
-                                            value == null || value.isEmpty
-                                            ? 'Por favor, insira sua resposta.'
-                                            : null,
-                                      ),
-                                      const SizedBox(height: 20),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: ElevatedButton(
-                                          onPressed: count,
+                                      ],
+                                      if (showResult) ...[
+                                        const Text(
+                                          'Quiz Concluído!',
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          'Você acertou $corretas de 3 questões!',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.grey.shade800,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 30),
+                                        ElevatedButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor:
-                                                Colors.amber.shade600,
+                                                Colors.blue.shade700,
                                             padding: const EdgeInsets.symmetric(
                                               vertical: 16,
+                                              horizontal: 24,
                                             ),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -372,60 +471,18 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                             ),
                                           ),
                                           child: const Text(
-                                            'Confirmar',
+                                            'Voltar ao Início',
                                             style: TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white,
                                             ),
                                           ),
                                         ),
-                                      ),
+                                        const SizedBox(height: 30),
+                                      ],
                                     ],
-                                    if (showResult) ...[
-                                      const Text(
-                                        'Quiz Concluído!',
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Text(
-                                        'Você acertou $score de 3 questões!',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.grey.shade800,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 30),
-                                      ElevatedButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.blue.shade700,
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 16,
-                                            horizontal: 24,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Voltar ao Início',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),

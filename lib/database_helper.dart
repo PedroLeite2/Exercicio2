@@ -89,9 +89,15 @@ class DatabaseHelper {
 
   Future<int> updateUserScore(String name, int score) async {
     Database db = await instance.database;
+    int? scoreAtual = await getUserScore(name);
+
+    if (scoreAtual != null) {
+      scoreAtual += score;
+    }
+
     return await db.update(
       tableUsers,
-      {columnScore: score},
+      {columnScore: scoreAtual},
       where: "$columnName = ?",
       whereArgs: [name],
     );

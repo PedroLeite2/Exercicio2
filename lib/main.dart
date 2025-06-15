@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:avaliacaoex2/login_widget.dart';
 import 'package:avaliacaoex2/configure_questions_widget.dart';
-import 'package:avaliacaoex2/scrore_widget.dart';
+import 'package:avaliacaoex2/score_widget.dart';
 import 'register_widget.dart';
 import 'database_helper.dart';
 
@@ -45,11 +45,24 @@ class MyExercicioTeste extends StatefulWidget {
 }
 
 class _MyExercicioTesteState extends State<MyExercicioTeste> {
+  String? nome = '';
+
+  Future<void> carregarNome() async {
+    final resultado = await DatabaseHelper.instance.getLoggedUser();
+    setState(() {
+      nome = resultado ?? '';
+      _nomeUtilizador = resultado;
+    });
+  }
+
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   String? _nomeUtilizador;
 
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex.value) {
+  Future<void> _onItemTapped(int index) async {
+    await carregarNome();
+
+    if (index == 1 && (nome == '' || nome == null)) {
+    } else if (index == _selectedIndex.value) {
       _navigatorKey.currentState?.popUntil((route) => route.isFirst);
     } else {
       setState(() {
@@ -88,7 +101,7 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
       case '/buildWidgetConfigureQuestions':
         final name = settings.arguments as String?;
         return MaterialPageRoute(
-          builder: (_) => buildWidgetConfigureQuestions(userName: name),
+          builder: (_) => buildWidgetConfigureQuestions(),
         );
 
       case '/score':
@@ -108,6 +121,8 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
         _routeName(_selectedIndex.value),
         arguments: _nomeUtilizador,
       );
+      print("WAAAAAAAAAAAAAAAAAAZAAAAAAAAAAAAAAAAAAAAA");
+      carregarNome();
     });
   }
 
@@ -129,7 +144,7 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
                 label: 'Login/Register',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.quiz), // Ícone de questionário para Questions
+                icon: Icon(Icons.quiz),
                 label: 'Questions',
               ),
               BottomNavigationBarItem(

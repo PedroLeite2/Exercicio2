@@ -1,24 +1,38 @@
 import 'package:avaliacaoex2/questions_widget.dart';
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
-import 'questions_widget.dart';
+import 'score_widget.dart';
 
-Widget buildWidgetConfigureQuestions({String? userName}) {
-  return ConfigureQuestionsPage(userName: userName);
+Widget buildWidgetConfigureQuestions() {
+  return ConfigureQuestionsPage();
 }
 
 Map<int, String> typeMap = {1: 'Endereços', 2: 'Sub-redes', 3: 'Super-redes'};
 
 class ConfigureQuestionsPage extends StatefulWidget {
-  final String? userName;
-
-  const ConfigureQuestionsPage({super.key, this.userName});
+  const ConfigureQuestionsPage({super.key});
 
   @override
   State<ConfigureQuestionsPage> createState() => _ConfigureQuestionsPageState();
 }
 
 class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
+  @override
+  void initState() {
+    super.initState();
+    carregarNome();
+  }
+
+  String? userName;
+
+  Future<void> carregarNome() async {
+    final resultado = await DatabaseHelper.instance.getLoggedUser();
+
+    setState(() {
+      userName = resultado ?? '';
+    });
+  }
+
   int? _selectedType;
 
   @override
@@ -70,7 +84,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                           ),
                         ),
                         child: Text(
-                          'Bem-vindo, ${widget.userName ?? 'Utilizador'}',
+                          'Bem-vindo, ${userName ?? 'Utilizador'}',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -94,10 +108,6 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                       letterSpacing: 1.2,
                     ),
                   ),
-
-     
-
-                 
 
                   const SizedBox(height: 40),
 
@@ -141,7 +151,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => QuestionsPage(
-                                        nameUser: widget.userName!,
+                                        nameUser: userName!,
                                         selectedType: _selectedType!,
                                       ),
                                     ),

@@ -1,3 +1,4 @@
+import 'package:avaliacaoex2/main.dart';
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'configure_questions_widget.dart';
@@ -59,6 +60,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     );
     if (success) {
       await DatabaseHelper.instance.saveLoggedUser(name);
+      bottomNavIndexNotifier.value = 1;
       _nameController.clear();
       _passwordController.clear();
       _paginaConfigurarQuestoes(name);
@@ -66,11 +68,9 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   }
 
   void _paginaConfigurarQuestoes(String name) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ConfigureQuestionsPage(userName: name),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => ConfigureQuestionsPage()));
   }
 
   void _paginaRegisto() {
@@ -397,8 +397,12 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                     const SizedBox(height: 40),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/home');
+                        bottomNavIndexNotifier.value = 1;
+                        Navigator.of(
+                          context,
+                        ).pushNamed('/buildWidgetConfigureQuestions');
                       },
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.amber.shade600,
                         padding: const EdgeInsets.symmetric(
@@ -416,6 +420,30 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                         ),
                       ),
                       child: const Text("Começar Jogo"),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        DatabaseHelper.instance.logoutUser();
+                        Navigator.of(context).pushReplacementNamed('/login');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 32,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 5,
+                        shadowColor: Colors.black.withOpacity(0.3),
+                        textStyle: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      child: const Text("Logout"),
                     ),
                   ],
                 ),
