@@ -15,7 +15,8 @@ class _RegistarState extends State<Registar> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
   String _message = "";
 
   void _register() async {
@@ -43,7 +44,7 @@ class _RegistarState extends State<Registar> {
   }
 
   void _paginaLogin() {
-    bottomNavIndexNotifier.value = 0;
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   InputDecoration _inputDecoration(String label) {
