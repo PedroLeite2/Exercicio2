@@ -33,7 +33,7 @@ class _RegistarState extends State<Registar> {
 
     Flushbar(
       messageText: Text(
-        "User '$name' registered.",
+        "Utilizador $name registrado com sucesso.",
         textAlign: TextAlign.center,
         style: const TextStyle(fontSize: 18, color: Colors.black),
       ),
