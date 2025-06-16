@@ -66,10 +66,7 @@ class _ConfigureQuestionsPageState extends State<ConfigureQuestionsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
+                     
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,

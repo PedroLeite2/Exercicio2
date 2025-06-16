@@ -77,13 +77,13 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           // Dark overlay for better readability
           Container(color: Colors.black.withOpacity(0.3)),
-          
+
           SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
                 const SizedBox(height: 60),
-                
+
                 // Title with the same style as other pages
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -117,9 +117,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Leaderboard card
                 Card(
                   elevation: 4,
@@ -172,9 +172,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -206,13 +206,30 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           // Dark overlay for better readability
           Container(color: Colors.black.withOpacity(0.3)),
-          
+
           SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
-                const SizedBox(height: 60),
-                
+                const SizedBox(height: 10),
+                const Text(
+                  "O meu Score",
+                  style: TextStyle(
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 10,
+                        color: Colors.black,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+
                 // User info card
                 Card(
                   elevation: 4,
@@ -248,9 +265,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Leaderboard title
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -284,9 +301,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
-                
-                const SizedBox(height: 30),
-                
+
+                const SizedBox(height: 5),
+
                 // Leaderboard card
                 Card(
                   elevation: 4,
@@ -302,7 +319,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       itemBuilder: (context, index) {
                         final user = _topScores[index];
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
+                          margin: const EdgeInsets.only(bottom: 9),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.7),
                             borderRadius: BorderRadius.circular(12),

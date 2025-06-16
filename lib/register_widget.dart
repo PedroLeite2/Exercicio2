@@ -28,6 +28,8 @@ class _RegistarState extends State<Registar> {
 
     _nameController.clear();
     _passwordController.clear();
+    _repeatPasswordController.clear();
+    _paginaLogin();
 
     Flushbar(
       messageText: Text(
@@ -186,26 +188,32 @@ class _RegistarState extends State<Registar> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Já tem conta?",
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                          const SizedBox(width: 10),
-                          TextButton(
-                            onPressed: _paginaLogin,
-                            child: const Text(
-                              "Faça Login Aqui",
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Já tem conta?",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.amber,
-                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 10),
+                            TextButton(
+                              onPressed: _paginaLogin,
+                              child: const Text(
+                                "Faça Login Aqui",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.amber,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 20),
                       SizedBox(

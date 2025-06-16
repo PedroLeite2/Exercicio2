@@ -129,7 +129,12 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title), centerTitle: true),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: Container(),
+        title: Text(widget.title),
+        centerTitle: true,
+      ),
       body: Navigator(key: _navigatorKey, onGenerateRoute: _onGenerateRoute),
       bottomNavigationBar: ValueListenableBuilder<int>(
         valueListenable: _selectedIndex,

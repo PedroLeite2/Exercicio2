@@ -2,6 +2,7 @@ import 'package:avaliacaoex2/main.dart';
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 import 'configure_questions_widget.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 Widget buildWidgetLogin() {
   return const LoginRegisterPage();
@@ -18,7 +19,6 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String _message = "";
   bool rememberMe = false;
   bool isThereAnUser = true;
   String username = "";
@@ -55,15 +55,28 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     final name = _nameController.text.trim();
     final password = _passwordController.text.trim();
     bool success = await DatabaseHelper.instance.loginUser(name, password);
-    setState(
-      () => _message = success ? "Login successful!" : "Invalid credentials.",
-    );
+
     if (success) {
       await DatabaseHelper.instance.saveLoggedUser(name);
       bottomNavIndexNotifier.value = 1;
       _nameController.clear();
       _passwordController.clear();
       _paginaConfigurarQuestoes(name);
+    } else {
+      Flushbar(
+        messageText: Text(
+          "Username ou password incorretos.",
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 18, color: Colors.black),
+        ),
+        backgroundColor: const Color.fromARGB(255, 231, 161, 145),
+        duration: const Duration(seconds: 2),
+        flushbarPosition: FlushbarPosition.TOP,
+        margin: const EdgeInsets.all(16),
+        borderRadius: BorderRadius.circular(8),
+      ).show(context);
+      _nameController.clear();
+      _passwordController.clear();
     }
   }
 
@@ -124,7 +137,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
             ),
           ),
           // Dark overlay for better readability
-          Container(color: Colors.black.withOpacity(0.3)),
+          Container(color: Colors.black.withOpacity(0.2)),
 
           SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
@@ -198,37 +211,64 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                           return null;
                         },
                       ),
-                      CheckboxListTile(
-                        value: rememberMe,
-                        onChanged: onChanged,
-                        title: const Text(
-                          "Lembrar-me",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        controlAffinity: ListTileControlAffinity.leading,
-                        activeColor: Colors.amber.shade600,
-                        checkColor: Colors.white,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Não tem conta?",
-                            style: TextStyle(fontSize: 16, color: Colors.white),
+                      Theme(
+                        data: Theme.of(context).copyWith(
+                          checkboxTheme: CheckboxThemeData(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            side: const BorderSide(color: Colors.white),
                           ),
-                          const SizedBox(width: 10),
-                          TextButton(
-                            onPressed: _paginaRegisto,
-                            child: const Text(
-                              "Registe-se",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.amber,
-                                fontWeight: FontWeight.bold,
+                        ),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: CheckboxListTile(
+                              value: rememberMe,
+                              onChanged: onChanged,
+                              title: const Text(
+                                "Lembrar-me",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               ),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: Colors.amber.shade600,
+                              checkColor: Colors.white,
+                              contentPadding: EdgeInsets.zero,
                             ),
                           ),
-                        ],
+                        ),
+                      ),
+
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Não tem conta?",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            TextButton(
+                              onPressed: _paginaRegisto,
+                              child: const Text(
+                                "Registe-se",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.amber,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 20),
                       SizedBox(
@@ -337,14 +377,6 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Text(
-                        _message,
-                        style: const TextStyle(
-                          color: Colors.amber,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ],
                   ),
                 ),
