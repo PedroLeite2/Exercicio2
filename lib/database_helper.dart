@@ -54,7 +54,7 @@ class DatabaseHelper {
     return res.isNotEmpty;
   }
 
-  // Guarda o nome do utilizador logado
+  // Guarda localmente o nome do utilizador autenticado
   Future<void> saveLoggedUser(String username) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loggedUser', username);
@@ -66,7 +66,7 @@ class DatabaseHelper {
     return prefs.getString('loggedUser');
   }
 
-  // Opcional: para logout - Se criarmos logout, podemos remover o utilizador logado
+  // Remove o utilizador autenticado (logout)
   Future<void> logoutUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('loggedUser');

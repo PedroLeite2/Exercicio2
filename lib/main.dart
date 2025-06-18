@@ -5,6 +5,7 @@ import 'package:avaliacaoex2/score_widget.dart';
 import 'register_widget.dart';
 import 'database_helper.dart';
 
+// Notificador para o índice da navegação inferior
 final ValueNotifier<int> bottomNavIndexNotifier = ValueNotifier<int>(0);
 final ValueNotifier<int> _selectedIndex = bottomNavIndexNotifier;
 
@@ -46,7 +47,7 @@ class MyExercicioTeste extends StatefulWidget {
 
 class _MyExercicioTesteState extends State<MyExercicioTeste> {
   String? nome = '';
-
+  // Carrega o nome do utilizador da base de dados
   Future<void> carregarNome() async {
     final resultado = await DatabaseHelper.instance.getLoggedUser();
     setState(() {
@@ -60,9 +61,10 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
 
   Future<void> _onItemTapped(int index) async {
     await carregarNome();
-
+    // Se o utilizador tentar aceder a uma página restrita sem estar autenticado
     if (index == 1 && (nome == '' || nome == null)) {
     } else if (index == _selectedIndex.value) {
+      // Se já estiver na mesma página, volta ao início dessa rota
       _navigatorKey.currentState?.popUntil((route) => route.isFirst);
     } else {
       setState(() {
@@ -81,6 +83,7 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
     }
   }
 
+  // Devolve o nome da rota consoante o índice da barra de navegação
   String _routeName(int index) {
     switch (index) {
       case 0:
@@ -94,6 +97,7 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
     }
   }
 
+  // Gera as rotas com base no nome e argumentos recebidos
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/login':
@@ -116,12 +120,12 @@ class _MyExercicioTesteState extends State<MyExercicioTeste> {
   @override
   void initState() {
     super.initState();
+    // Redireciona para a rota correta após o carregamento do widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _navigatorKey.currentState?.pushReplacementNamed(
         _routeName(_selectedIndex.value),
         arguments: _nomeUtilizador,
       );
-      print("WAAAAAAAAAAAAAAAAAAZAAAAAAAAAAAAAAAAAAAAA");
       carregarNome();
     });
   }

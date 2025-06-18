@@ -34,15 +34,18 @@ class _QuestionsPageState extends State<QuestionsPage> {
   final formKey = GlobalKey<FormState>();
   bool valido = false;
 
+  // Calcula a pontuação com base na resposta e tipo de pergunta
   int pontuacao(bool resposta) {
     return (type() * (resposta ? 10 : -5));
   }
 
+  // Atualiza a pontuação do utilizador na base de dados
   Future<int?> atualizarScore() async {
     await DatabaseHelper.instance.updateUserScore(widget.nameUser!, score);
     return await DatabaseHelper.instance.getUserScore(widget.nameUser!);
   }
 
+  // Verifica se a resposta está certa, atualiza score e estado
   void confirmar() async {
     bool estaCerta =
         removeDiacritics(_controller.text.trim().toLowerCase()) ==
@@ -64,6 +67,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
     }
   }
 
+  // Calcula o Network ID dado um IP e prefixo
   String calculateNetworkId(String ip, int prefix) {
     final ipInt = ipToInt(ip);
     final mask = prefixToMask(prefix);
@@ -71,6 +75,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
     return intToIp(networkInt);
   }
 
+  // Calcula o endereço de broadcast com base no Network ID e prefixo
   String calculateBroadcastAddress(String networkId, int prefixo) {
     int networkInt = ipToInt(networkId);
     int mask = prefixToMask(prefixo);
@@ -78,10 +83,12 @@ class _QuestionsPageState extends State<QuestionsPage> {
     return intToIp(broadcastInt);
   }
 
+  // Retorna o tipo de pergunta selecionado
   int type() {
     return widget.selectedType;
   }
 
+  // Cria uma pergunta com base no tipo e número da pergunta
   String createQuestion(int pergunta) {
     final int t = type();
     final int prefixo = createMaskRandom(t);
@@ -121,6 +128,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
+  // Retorna o texto da pergunta formatado
   String questionTemplate({
     required String ip1,
     String? ip2,
@@ -139,6 +147,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
     }
   }
 
+  // Gera um IP aleatório com base na classe
   String createIpRandomEnderecos(int classe) {
     switch (classe) {
       case 8:
@@ -152,19 +161,23 @@ class _QuestionsPageState extends State<QuestionsPage> {
     }
   }
 
+  // Converte IP (string) para inteiro
   int ipToInt(String ip) {
     final parts = ip.split('.').map(int.parse).toList();
     return (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3];
   }
 
+  // Converte inteiro para IP (string)
   String intToIp(int ip) {
     return '${(ip >> 24) & 0xFF}.${(ip >> 16) & 0xFF}.${(ip >> 8) & 0xFF}.${ip & 0xFF}';
   }
 
+  // Converte prefixo para máscara de sub-rede
   int prefixToMask(int prefix) {
     return 0xFFFFFFFF << (32 - prefix) & 0xFFFFFFFF;
   }
 
+  // Gera IP aleatório dentro da mesma sub-rede
   String generateIpInSameSubnet(String ip, int prefix) {
     final rand = Random();
     final ipInt = ipToInt(ip);
@@ -180,6 +193,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
     return intToIp(newIpInt);
   }
 
+  // Cria um IP com base no tipo e prefixo fornecidos
   String createIp(int prefixo, int type) {
     if (type == 1) {
       return createIpRandomEnderecos(prefixo);
@@ -192,6 +206,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
     }
   }
 
+  // Cria IP aleatório dentro de uma sub-rede válida
   String createIpRandomSubRedes(int prefixo) {
     List<int> octets;
     if (prefixo <= 15) {
@@ -228,6 +243,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
     return '$base.$host';
   }
 
+  // Gera prefixo de máscara aleatório conforme o tipo de pergunta
   int createMaskRandom(int type) {
     if (type == 1) {
       List<int> prefixes = [8, 16, 24];
@@ -368,14 +384,6 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                             fontSize: 18,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.grey.shade800,
-                                          ),
-                                        ),
-                                        Text(
-                                          respostaCorreta,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.orange,
                                           ),
                                         ),
                                         const SizedBox(height: 20),
